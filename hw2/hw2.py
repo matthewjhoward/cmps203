@@ -66,6 +66,9 @@ class Comm(Exp):
                 self.e2.eval()
             else:
                 self.e3.eval()
+        elif self.kind == 'Sequence':
+            self.e1.eval()
+            self.e2.eval()
         elif self.kind == 'While':
             if self.e1.eval():
                 self.e2.eval()
