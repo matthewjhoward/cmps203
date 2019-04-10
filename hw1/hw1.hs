@@ -1,6 +1,13 @@
--- Author: Matthew J. Howard
--- Date: 4/7/2019
--- Details: Implements basic interpreter for ARITH language. Handles basic sums (SumExpr), multiplication (MulExpr) and adds a new feature for power operations (PowExpr). 3 test cases provided for each expression provided via Test.QuickCheck module.
+-- Program: hw1.hs
+-- Authors: Matthew J. Howard and Alex Williamson
+-- Date: 4/12/2019
+-- Details: Implements basic interpreter for ARITH language. Handles basic sums (SumExpr), multiplication (MulExpr) and adds a new feature for power operations (PowExpr). 
+--          3 test cases provided for each expression provided via Test.QuickCheck module.
+--
+--          On this homework, we worked in total for 2 hours.
+--          Matt worked independently on the AST interpreter for 30 minutes.
+--          Alex worked independently on the AST class implementation for 30 minutes.
+--          We worked together on the test cases for 1 hour.      
 
 import Test.QuickCheck
 
