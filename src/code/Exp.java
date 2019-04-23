@@ -1,3 +1,5 @@
+package code;
+
 public abstract class Exp {
     public Exp(String kind) {
         this.kind = kind;
@@ -10,12 +12,12 @@ public abstract class Exp {
 
 public class Aexp extends Exp {
     public Aexp(String kind, Exp e1) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
     }
 
     public Aexp(String kind, Exp e1, Exp e2) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
         this.e2 = e2;
     }
@@ -39,16 +41,16 @@ public class Aexp extends Exp {
 
 public class Bexp extends Exp {
     public Bexp(String kind) {
-        super.Exp(kind);
+        super(kind);
     }
 
     public Bexp(String kind, Exp e1) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
     }
 
     public Bexp(String kind, Exp e1, Exp e2) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
         this.e2 = e2;
     }
@@ -68,7 +70,7 @@ public class Bexp extends Exp {
             return this.e1.eval() < this.e2.eval();
         }
         else if(this.kind == "NotExp") {
-            return !(this.e1.eval();
+            return !(this.e1.eval());
         }
         else if(this.kind == "AndExp") {
             return this.e1.eval() && this.e2.eval();
@@ -81,22 +83,22 @@ public class Bexp extends Exp {
 
 public class Comm extends Exp {
     public Comm(String kind) {
-        super.Exp(kind);
+        super(kind);
     }
 
     public Comm(String kind, Exp e1) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
     }
 
     public Comm(String kind, Exp e1, Exp e2) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
         this.e2 = e2;
     }
 
     public Comm(String kind, Exp e1, Exp e2, Exp e3) {
-        super.Exp(kind);
+        super(kind);
         this.e1 = e1;
         this.e2 = e2;
         this.e3 = e3;
