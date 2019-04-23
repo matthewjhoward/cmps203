@@ -1,51 +1,22 @@
-from abc import abstractmethod
 vals = {}
 class Exp:
     def __init__(self, kind):
         self.kind = kind
 
-    @abstractmethod
-    def eval(self):
-        pass
 
 class Aexp(Exp):
     def __init__(self, kind, e1, e2=None):
         super().__init__(kind)
         self.e1 = e1
         self.e2 = e2
-
-    def eval(self):
-        if self.kind == 'IntExp':
-            return self.e1
-        elif self.kind == 'SumExp':
-            return self.e1.eval() + self.e2.eval()
-        elif self.kind == 'MulExp':
-            return self.e1.eval() * self.e2.eval()
-        elif self.kind == 'LocExp':
-            # print(vals)
-            return vals[self.e1]
-    
+  
 class Bexp(Exp):
     def __init__(self, kind, e1=None, e2=None):
         super().__init__(kind)
         self.e1 = e1
         self.e2 = e2
 
-    def eval(self):
-        if self.kind == 'TrueExp':
-            return True
-        elif self.kind == 'FalseExp':
-            return False
-        elif self.kind == 'EqualsExp':
-            return self.e1.eval() == self.e2.eval()
-        elif self.kind == 'LessExp':
-            return self.e1.eval() < self.e2.eval()
-        elif self.kind == 'NotExp':
-            return not(self.e1.eval())
-        elif self.kind == 'AndExp':
-            return self.e1.eval() and self.e2.eval()
-        elif self.kind == 'OrExp':
-            return self.e1.eval() or self.e2.eval()
+
 
 class Comm(Exp):
     def __init__(self, kind, e1=None, e2=None, e3=None):
@@ -53,30 +24,50 @@ class Comm(Exp):
         self.e1 = e1
         self.e2 = e2
         self.e3 = e3
-        # self.vals = {}
 
-    def eval(self):
-        if self.kind == 'Skip':
+
+def evaluate(statement):
+    if statement.kind == 'IntExp':
+        return statement.e1
+    elif statement.kind == 'SumExp':
+        return evaluate(statement.e1) + evaluate(statement.e2)
+    elif statement.kind == 'MulExp':
+        return evaluate(statement.e1) * evaluate(statement.e2)
+    elif statement.kind == 'LocExp':
+        # print(vals)
+        return vals[statement.e1]
+    elif statement.kind == 'TrueExp':
+        return True
+    elif statement.kind == 'FalseExp':
+        return False
+    elif statement.kind == 'EqualsExp':
+        return evaluate(statement.e1) == evaluate(statement.e2)
+    elif statement.kind == 'LessExp':
+        return evaluate(statement.e1) < evaluate(statement.e2)
+    elif statement.kind == 'NotExp':
+        return not(evaluate(statement.e1))
+    elif statement.kind == 'AndExp':
+        return evaluate(statement.e1) and evaluate(statement.e2)
+    elif statement.kind == 'OrExp':
+        return evaluate(statement.e1) or evaluate(statement.e2)
+    elif statement.kind == 'Skip':
             pass
-        elif self.kind == 'Set':
-            vals[self.e1] = self.e2.eval()
-            # print(vals)
-        elif self.kind == 'IfThenElse':
-            if self.e1.eval():
-                self.e2.eval()
-            else:
-                self.e3.eval()
-        elif self.kind == 'Sequence':
-            self.e1.eval()
-            self.e2.eval()
-        elif self.kind == 'While':
-            if self.e1.eval():
-                self.e2.eval()
-                Comm('While', self.e1, self.e2).eval()
-
-
-
-
+    elif statement.kind == 'Set':
+        vals[statement.e1] = evaluate(statement.e2)
+        # print(vals)
+    elif statement.kind == 'IfThenElse':
+        if evaluate(statement.e1):
+            evaluate(statement.e2)
+        else:
+            evaluate(statement.e3)
+    elif statement.kind == 'Sequence':
+        evaluate(statement.e1)
+        evaluate(statement.e2)
+    elif statement.kind == 'While':
+        if evaluate(statement.e1):
+            evaluate(statement.e2)
+            evaluate(Comm('While', statement.e1, statement.e2))
+            
 
 
 
@@ -88,6 +79,6 @@ i3 = Comm('Set', 'x', Aexp('SumExp', Aexp('LocExp', 'x'), Aexp('IntExp', 1)))
 
 test = Comm('While', b, i3)
 
-i1.eval()
-print(test.eval()) 
-
+evaluate(i1)
+print(evaluate(test)) 
+print(vals)
