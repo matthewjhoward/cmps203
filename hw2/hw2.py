@@ -129,4 +129,4 @@ evaluate(c5), print("Results of c5: ", vals)
 #                         )
 
 # print(evaluate(command)) 
-# print(vals)
+# print(vals) la
