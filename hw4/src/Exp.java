@@ -1,16 +1,23 @@
-package code;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Exp {
+    private String kind;
+
     public Exp(String kind) {
         this.kind = kind;
     }
 
     public abstract Exp eval();
 
-    public static Map<String, Integer> vals = new HashMap<String, Integer>(); //needs to be some sort of object template? or just string, int
+    public static Map<Exp, Exp> vals = new HashMap<Exp, Exp>(); //needs to be some sort of object template? or just string, int
 }
 
 public class Aexp extends Exp {
+    private String kind;
+    private Exp e1;
+    private Exp e2;
+
     public Aexp(String kind, Exp e1) {
         super(kind);
         this.e1 = e1;
@@ -40,6 +47,10 @@ public class Aexp extends Exp {
 }
 
 public class Bexp extends Exp {
+    private String kind;
+    private Exp e1;
+    private Exp e2;
+
     public Bexp(String kind) {
         super(kind);
     }
@@ -82,6 +93,11 @@ public class Bexp extends Exp {
 }
 
 public class Comm extends Exp {
+    private String kind;
+    private Exp e1;
+    private Exp e2;
+    private Exp e3;
+
     public Comm(String kind) {
         super(kind);
     }
@@ -107,7 +123,7 @@ public class Comm extends Exp {
     @Override
     public Exp eval() {
         if(this.kind == "Skip") {
-            continue;
+            // Do nothing
         }
         else if(this.kind == "Set") {
             vals.put(this.e1, this.e2.eval());
@@ -126,7 +142,7 @@ public class Comm extends Exp {
         }
         else if(this.kind == "While") {
             if(this.e1.eval()) {
-                self.e2.eval();
+                this.e2.eval();
                 Comm comm = new Comm("While", this.e1, this.e2);
                 comm.eval();
             }

@@ -89,5 +89,5 @@ i3 = Comm('Set', 'x', Aexp('SumExp', Aexp('LocExp', 'x'), Aexp('IntExp', 1)))
 test = Comm('While', b, i3)
 
 i1.eval()
-print(test.eval())
+print(test.eval()) 
 
