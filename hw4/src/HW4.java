@@ -154,19 +154,21 @@ public class HW4 {
         // Aexp i10 = new Aexp("IntExp", 10);
         // Aexp i5 = new Aexp("IntExp", 5);
         // Aexp mul510 = new Aexp("MulExp", i5, i10);
-        // Comm i1 = new Comm("Set", "x", new Aexp("IntExp", 1));
-        // Bexp b = new Bexp("LessExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 3));
-        // Comm i3 = new Comm("Set", "x", new Aexp("SumExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 1)));
-        // Comm test = new Comm("While", b, i3);
+        Comm i1 = new Comm("Set", "x", new Aexp("IntExp", 1));
+        Bexp b = new Bexp("LessExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 3));
+        Comm i3 = new Comm("Set", "x", new Aexp("SumExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 1)));
+        Comm test = new Comm("While", b, i3);
+        Comm test_while = new Comm("Sequence", i1, test);
         
         Aexp x = new Aexp("LocExp", "x");
-        Comm sample = new Comm("Sequence", 
+        Comm hw_example = new Comm("Sequence", 
             new Comm("Set", "x", new Aexp("IntExp", 3)), 
             new Comm("IfThenElse", new Bexp("LessExp", x, new Aexp("IntExp", 5)),
             new Comm("Set", "x", new Aexp("SumExp", x, new Aexp("IntExp", 1))),
             new Comm("Set", "x", new Aexp("SubExp", x, new Aexp("IntExp", 1)))));
-        evaluate(sample);
-        System.out.println(Arrays.asList(vals));
+        // evaluate(hw_example);
+        evaluate(test_while);
+        // System.out.println(Arrays.asList(vals));
     }
 
     public static void evaluate(Exp statement){
@@ -264,17 +266,23 @@ public class HW4 {
                 }
                 return null;
                 
-                
 
-                
-
-                
             case "While":
 
                 if(evaluateB((Bexp)exp.e1)){
-                    evaluateC((Comm)exp.e2, true);
-                    evaluateC((Comm)exp, true);
+                    c1 = evaluateC((Comm)exp.e2, false);
+                    if (c1 != null){
+                        Comm c2 = new Comm("Sequence", c1, (Comm)exp);
+                        evaluateC(c2, true);
+                    }else{
+                        evaluateC((Comm)exp, true);
+                    }
+                    
+                }else{
+                    evaluateC(new Comm("Skip"), true);
                 }
+                
+                //Else return/evaluate skip?
                 return null;
 
 
