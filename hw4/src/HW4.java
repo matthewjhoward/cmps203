@@ -1,3 +1,19 @@
+/*
+-- Program: hw4.java
+-- Authors: Matthew J. Howard and Alex Williamson
+-- Date: 5/10/2019
+-- Details: Implements small-step interpreter for WHILE language, which covers arithmetic, boolean, and command expressions. 
+--          Prints out entire program at each evaluation step of the program. 
+--          Test cases provided to demonstrate the correctness of the small-step interpreter. Test cases include
+--          the provided IfThenElse example from the homework assignment, as well as additional While loops, and IfThenElse
+--          with while loops inside, covering all arithmetic, boolean, and command operations
+--
+--          On this homework, we worked in total for 6 hours.
+--          Matt worked independently on the AST interpreter for 2 hours.
+--          Alex worked independently on the AST class implementation and test cases for 2 hours.
+--          We worked together on merging code/ideas for 2 hour. 
+*/   
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Arrays;
