@@ -71,6 +71,10 @@ public class HW4 {
         public Bexp(String kind){
             super(kind);
         }
+        public Bexp(String kind, Exp e1){
+            super(kind);
+            this.e1 = e1;
+        }
 
         public Bexp(String kind, Exp e1, Exp e2){
             super(kind);
@@ -133,10 +137,8 @@ public class HW4 {
                 return "skip";
             }else if(this.kind == "Set"){
                 return this.var + ":=" + ((Aexp)e1).toString();
-                // return "broken";
             }else if(this.kind == "Sequence"){
-                return ((Comm)e1).toString() + ";" + ((Comm)e2).toString();
-                // return "broken";
+                return ((Comm)e1).toString() + "; " + ((Comm)e2).toString();
             }else if(this.kind == "IfThenElse"){
                 return "if (" + e1.toString() + ") " + e2.toString() + " else " + e3.toString();
             }else if(this.kind == "While"){
@@ -145,20 +147,10 @@ public class HW4 {
             return "";
         }
     }
-
-    
-
     
     public static void main(String[] args){
-        // System.out.println("hello, world");
-        // Aexp i10 = new Aexp("IntExp", 10);
-        // Aexp i5 = new Aexp("IntExp", 5);
-        // Aexp mul510 = new Aexp("MulExp", i5, i10);
-        Comm i1 = new Comm("Set", "x", new Aexp("IntExp", 1));
-        Bexp b = new Bexp("LessExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 3));
-        Comm i3 = new Comm("Set", "x", new Aexp("SumExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 1)));
-        Comm test = new Comm("While", b, i3);
-        Comm test_while = new Comm("Sequence", i1, test);
+
+        
         
         Aexp x = new Aexp("LocExp", "x");
         Comm hw_example = new Comm("Sequence", 
@@ -166,18 +158,55 @@ public class HW4 {
             new Comm("IfThenElse", new Bexp("LessExp", x, new Aexp("IntExp", 5)),
             new Comm("Set", "x", new Aexp("SumExp", x, new Aexp("IntExp", 1))),
             new Comm("Set", "x", new Aexp("SubExp", x, new Aexp("IntExp", 1)))));
-        // evaluate(hw_example);
+
+        Comm x1 = new Comm("Set", "x", new Aexp("IntExp", 1));
+        Comm x0 = new Comm("Set", "x", new Aexp("IntExp", 0));
+        Comm x100 = new Comm("Set", "x", new Aexp("IntExp", 100));
+        Bexp xless3 = new Bexp("LessExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 3));
+        Bexp xless2 = new Bexp("LessExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 2)); 
+        Comm xplus1 = new Comm("Set", "x", new Aexp("SumExp", new Aexp("LocExp", "x"), new Aexp("IntExp", 1)));
+        Comm test = new Comm("While", xless3, xplus1);
+        Comm test_while = new Comm("Sequence", x1, test);
+
+        Comm while2 = new Comm("Sequence",
+            x1, 
+            new Comm("While", 
+                new Bexp("NotExp", new Bexp("EqualsExp", x, new Aexp("IntExp", 32))),
+                new Comm("Set", "x", new Aexp("MulExp", x, new Aexp("IntExp", 2)))));
+            
+
+        Comm if2 = new Comm("Sequence",
+            x0,
+            new Comm("IfThenElse", xless2,
+                new Comm("While", xless2, xplus1),
+                x100));
+
+        System.out.println("--- Test Cases ---");
+        System.out.println();
+        System.out.println("-- Test 1: IfThenElse (from HW instructions) --");
+        evaluate(hw_example);
+        
+        System.out.println();
+        System.out.println("-- Test 2: x=1, While x<3, x+1 --");
+        vals.clear();
         evaluate(test_while);
-        // System.out.println(Arrays.asList(vals));
+
+        System.out.println();
+        System.out.println("-- Test 3: x=1, While not(x==32), x=2*x --");
+        vals.clear();
+        evaluate(while2);
+
+        System.out.println();
+        System.out.println("-- Test 4: x=0; If (x<2) then while (x<2) x=x+1 else x=100 --");
+        vals.clear();
+        evaluate(if2);
+
     }
 
     public static void evaluate(Exp statement){
         if(statement instanceof Aexp){
-            // Aexp new_statement = (Aexp) statement;
-            // System.out.println(new_statement.value);
             Aexp exp = (Aexp) statement;
             evaluateA(exp);
-            // System.out.println(out);
         }
         else if(statement instanceof Bexp){
             Bexp exp = (Bexp) statement;
@@ -189,7 +218,6 @@ public class HW4 {
         }
     }
     public static int evaluateA(Aexp exp){
-        // System.out.println(exp);
         switch(exp.kind)
         {
             case "IntExp":
@@ -206,7 +234,6 @@ public class HW4 {
         return -1;
     }
     public static boolean evaluateB(Bexp exp){
-        // System.out.println(exp);
         switch(exp.kind)
         {
             case "TrueExp":
@@ -233,22 +260,15 @@ public class HW4 {
         if(print){
             System.out.println("<" + exp + ", " + vals + ">" );
         }
-        
-        
         switch(exp.kind)
         {
             case "Skip":
-                // System.out.println("<" + exp + ", " + vals + ">" );
                 return null;
             case "Set":
-                // System.out.println("<" + exp + ", " + vals + ">" );
-                
                 vals.put(exp.var, evaluateA((Aexp)exp.e1));
                 evaluateC(new Comm("Skip"), print);
                 return new Comm("Skip");
-                // return null;
             case "IfThenElse":
-                // System.out.println("<" + exp + ", " + vals + ">" );
                 if (evaluateB((Bexp)exp.e1)){
                     evaluateC((Comm)exp.e2, true);
                 }else{
@@ -256,7 +276,6 @@ public class HW4 {
                 }
                 return null;
             case "Sequence":
-                // System.out.println("<" + exp + ", " + vals + ">" );
                 Comm c1 = evaluateC((Comm)exp.e1, false);
                 if(c1 != null){
                     Comm c2 = new Comm("Sequence", c1, (Comm)exp.e2);
@@ -265,24 +284,14 @@ public class HW4 {
                     evaluateC((Comm)exp.e2,true);
                 }
                 return null;
-                
-
             case "While":
-
                 if(evaluateB((Bexp)exp.e1)){
-                    c1 = evaluateC((Comm)exp.e2, false);
-                    if (c1 != null){
-                        Comm c2 = new Comm("Sequence", c1, (Comm)exp);
-                        evaluateC(c2, true);
-                    }else{
-                        evaluateC((Comm)exp, true);
-                    }
-                    
+                    Comm c2 = new Comm("Sequence", exp.e2, exp);
+                    evaluateC(c2, true);
+
                 }else{
                     evaluateC(new Comm("Skip"), true);
                 }
-                
-                //Else return/evaluate skip?
                 return null;
 
 
