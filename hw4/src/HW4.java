@@ -12,6 +12,12 @@
 --          Matt worked independently on the AST interpreter for 2 hours.
 --          Alex worked independently on the AST class implementation and test cases for 2 hours.
 --          We worked together on merging code/ideas for 2 hour. 
+--
+--          EXTRA CREDIT: We used 3 different languages for HW1, HW2, and HW4.
+--
+--                        HW1 used Haskell
+--                        HW2 used Python 
+--                        HW4 used Java
 */   
 
 import java.util.HashMap;
