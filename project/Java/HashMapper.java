@@ -75,7 +75,6 @@ class HashMapper<K,V>{
         if(head == null){
             return null;
         }
-        // System.out.println(head.value);
         undoStack.push(head.value);
         size--;
 

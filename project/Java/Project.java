@@ -6,8 +6,6 @@ import java.io.IOException;
 
 public class Project {
     public static void main(String[] args) {
-        // System.out.println("Hello World!");
-        // File inputfile = new File("input.txt");
         BufferedReader reader;
         ArrayList<String> lines = new ArrayList<String>();
 
@@ -16,7 +14,6 @@ public class Project {
             reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
             while (line != null) {
-                // System.out.println(line);
                 lines.add(line);
                 line = reader.readLine();
             }
@@ -26,7 +23,6 @@ public class Project {
         }
 
         HashMapper<String, User> hashTable = new HashMapper<>();
-        // LinkedStacker<User> undoStack = new LinkedStacker<>();
 
         // For each line, store in hash map
         for (String line : lines) {
@@ -40,7 +36,6 @@ public class Project {
 
             User user = new User(firstname, lastname, username, password);
             hashTable.put(username, user);
-            // System.out.println(line);
         }
 
         processMenu(hashTable);
@@ -103,13 +98,6 @@ public class Project {
                 default:
                     System.out.println("Letter not valid!");
             }
-
-            // System.out.println("Would you like to continue using the User database? Input Yes('Y' or 'y') or No ('N' or 'n'): ");
-            // ynAnswer = scan.nextLine();
-
-            // String type = ynAnswer.getClass().getSimpleName();
-            // System.out.println(type);
-            // System.out.println(Objects.equals(ynAnswer, "N"));
 
         } while (Objects.equals(letterChoice, "F") == false && Objects.equals(letterChoice, "f") == false);
 
