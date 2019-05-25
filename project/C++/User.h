@@ -2,6 +2,7 @@
 #define _USER
 
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -19,15 +20,31 @@ class User {
         // Constructor
         User(string firstname, string lastname, string username, string password);
 
+        // Setters
+        void setFirstname(string firstname){ this->firstname = firstname; }
+        void setLastname(string lastname){ this->lastname = lastname; }
+        void setUsername(string username){ this->username = username; }
+        void setPassword(string password){ this->password = password; }
+
+        // Getters
+        string getFirstname(){ return firstname; }
+	    string getLastname(){ return lastname; }
+	    string getUsername(){ return username; }
+	    string getPassword() { return password; }
+
         // Print the key and value for a given DatabeObject 
         void printUser();
 };
 
 User::User() {
-    this->firstname = NULL;
-    this->lastname = NULL;
-    this->username = NULL;
-    this->password = NULL;
+    // this->firstname = NULL;
+    // this->lastname = NULL;
+    // this->username = NULL;
+    // this->password = NULL;
+    this->firstname = "";
+    this->lastname = "";
+    this->username = "";
+    this->password = "";
 }
 
 User::User(string firstname, string lastname, string username, string password) {

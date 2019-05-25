@@ -28,10 +28,10 @@ struct inputFileTuple {
 inputFileTuple openInputFile(ifstream &ifs);
 void readInputFile(ifstream &inputFile, HashTable<User>* hashTable);
 void processMenu(HashTable<User>* hashTable, LinkedStack<User> undoStack);
-void addUser(HashTable<User>* hashTable)
-User getUser(HashTable<User>* hashTable)
-void removeUser(HashTable<User>* hashTable, LinkedStack<User>& undoStack)
-void printEfficiencyData(HashTable<User>* hashTable)
+void addUser(HashTable<User>* hashTable);
+User getUser(HashTable<User>* hashTable);
+void removeUser(HashTable<User>* hashTable, LinkedStack<User>& undoStack);
+void printEfficiencyData(HashTable<User>* hashTable);
 
 int main() {
     ifstream inputFile;
@@ -50,7 +50,7 @@ int main() {
     // Declare Hash Table for storing the input file of user data
     HashTable<User>* hashTable = new HashTable<User>();
 
-    LinkedStack<VideoGame> undoStack;
+    LinkedStack<User> undoStack;
 
     readInputFile(inputFile, hashTable);
 
@@ -61,7 +61,7 @@ int main() {
     User* user = new User("Alex", "Williamson", "alswilli69", "thisisabadpassword567");
     user->printUser();
 
-    processMenu(hTable, undoStack);
+    processMenu(hashTable, undoStack);
 
 	cout << "Now ending program..." << endl;
 	delete hashTable;
@@ -95,7 +95,7 @@ void readInputFile(ifstream &inputFile, HashTable<User>* hashTable) {
 		getline(inputFile, password);
 		getline(inputFile, username);
 		User* user = new User(firstname, lastname, password, username);
-		hashTable->insert(username, user);
+		hashTable->insert(username, *user);
 	}
 
 	cout << endl;
@@ -125,51 +125,66 @@ void processMenu(HashTable<User>* hashTable, LinkedStack<User> undoStack) {
 		{
 		case 'a':
 		case 'A':
-			addUser(hashTable);
+			{
+				addUser(hashTable);
+			}
 			break;
 
 		case 'b':
 		case 'B':
-			User user = getUser(hashTable);
-            cout << "Found User! Now displaying..." << endl;
-            cout << "First Name: " << user.firstname << endl;
-            cout << "Last Name: " << user.lastname << endl;
-            // cout << "Username: " << user.lastname << endl;
-            // cout << "Password: " << user.firstname << endl;
-            cout << endl;
+			{
+				User user = getUser(hashTable);
+				cout << "Found User! Now displaying..." << endl;
+				cout << "First Name: " << user.getFirstname() << endl;
+				cout << "Last Name: " << user.getLastname() << endl;
+				// cout << "Username: " << user.lastname << endl;
+				// cout << "Password: " << user.firstname << endl;
+				cout << endl;
+			}
 			break;
 
 		case 'c':
 		case 'C':
-			removeUser(hashTable, undoStack);
+			{
+				removeUser(hashTable, undoStack);
+			}
 			break;
 
 		case 'd':
 		case 'D':
-			if (!undoStack.isEmpty())
 			{
-				*undoptr = undoStack.peek();
-				hTable->insert(undoptr); // needs to be modified to except key and value
-				undoStack.pop();
-				undoUsed = true;
-			}
-			else
-			{
-				cout << "No removals to undo!" << endl << endl;
+				if (!undoStack.isEmpty())
+				{
+					*undoptr = undoStack.peek();
+					string key = undoptr->getUsername();
+					hashTable->insert(key, *undoptr); // needs to be modified to accept key and value
+					undoStack.pop();
+					undoUsed = true;
+				}
+				else
+				{
+					cout << "No removals to undo!" << endl << endl;
 
+				}
 			}
 			break;
 
 		case 'e':
 		case 'E':
-			printEfficiencyData(hashTable);
+			{
+				printEfficiencyData(hashTable);
+			}
 			break;
 
 		case 'f':
 		case 'F':
-			if (undoUsed == false) delete undoptr;
-			cout << "Now quitting Menu..." << endl;
-			return;
+			{
+				if (undoUsed == false) {
+					delete undoptr;
+				}
+				cout << "Now quitting Menu..." << endl;
+				return;	
+			}
 
 		default: cout << "Letter not valid!" << endl;
 		}
@@ -203,7 +218,7 @@ void addUser(HashTable<User>* hashTable) {
 		cin.get();
 		cout << endl;
 
-        if (hashTable->get(username)) // Check if exists
+        if (hashTable->get(username) != NULL) // Check if exists
 		{
             // We should change this functionality so that they can input another username instead
 			cout << "There is already a User with that username in the Hash Table! Returning to menu..." << endl; 
@@ -217,7 +232,7 @@ void addUser(HashTable<User>* hashTable) {
 		User* user = new User(firstname, lastname, username, password);
 
 		cout << "Now adding User to Hash Table..." << endl;
-		hashTable->insert(user);
+		hashTable->insert(username, *user);
         cout << "User added." << endl;
 
 		cout << "Would you like to add another User? Input Yes('Y' or 'y') or No('N' or 'n'): ";
@@ -233,13 +248,13 @@ User getUser(HashTable<User>* hashTable) {
     cin >> username;
     cout << endl;
 
-    User user = hTable->get(username);
+    User user = hashTable->get(username); // NEEDS TO RETURN A POINTER!!!!!
 
-    if (user == NULL) 
+    if (!user) 
     {
         // We should change this functionality so that they can input another username instead
         cout << "Could not find User with provided. Returning to menu..." << endl;
-        return;
+        return 0;
     }
     else
 
@@ -255,12 +270,13 @@ void removeUser(HashTable<User>* hashTable, LinkedStack<User>& undoStack) {
         cout << "What is the username of the User you would like to remove: " << endl;
         cin >> username;
         cout << endl;
+		User user = hashTable->get(username)
 
-        if (hashTable->get(username)) // Check if exists
+        if (user != NULL) // Check if exists
 		{
 			cout << "User found! Now removing User..." << endl;
-            undoStack.push(username);
-			hashTable->remove(username)
+            undoStack.push(user);
+			hashTable->remove(username);
             cout << "User removed." << endl;
 		}
         else {

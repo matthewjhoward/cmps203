@@ -1,8 +1,3 @@
-// Linked list implementation of stack ADT
-// Created by Frank M. Carrano and Tim Henry.
-// Modified by C. Lee-Klawender
-
-
 #ifndef _LINKED_STACK
 #define _LINKED_STACK
 

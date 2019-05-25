@@ -1,6 +1,3 @@
-// Stack abstract base class
-// Created by Frank M. Carrano and Tim Henry
-
 #ifndef _STACK_INTERFACE
 #define _STACK_INTERFACE
 

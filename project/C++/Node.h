@@ -1,7 +1,3 @@
-// Linkded List Node Class
-// Created by Frank M. Carrano and Tim Henry.
-// Modified by CNguyen
-
 #ifndef _NODE
 #define _NODE
 
