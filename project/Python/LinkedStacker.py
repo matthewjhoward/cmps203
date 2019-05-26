@@ -1,29 +1,31 @@
+from Noder import Noder
+
 class LinkedStacker:
-    top = Node(None)
+    # top = None
 
     def __init__(self):
-        top = None
+        self.top = Noder(None)
 
     def isEmpty(self):
-        if top is None:
+        if self.top is None:
             return True
-        else
+        else:
             return False
     
     def push(self, data):
-        newNode = Node(data)
-        newNode.nextNode = top
-        top = newNode
+        newNode = Noder(data)
+        newNode.nextNode = self.top
+        self.top = newNode
         return True
 
     def pop(self):
-        if isEmpty() == True:
+        if self.isEmpty() == True:
             return False
 
-        nodeToDelete = top
-        top = top.nextNode
+        nodeToDelete = self.top
+        self.top = self.top.nextNode
         nodeToDelete = None
         return True
 
     def peek(self):
-        return top.data
+        return self.top.data

@@ -1,9 +1,9 @@
 class User:
     # Fields
-    firstname = None
-    lastname = None
-    username = None
-    password = None
+    # firstname = None
+    # lastname = None
+    # username = None
+    # password = None
 
     # Constructor
     def __init__(self, firstname, lastname, username, password):
@@ -27,15 +27,15 @@ class User:
 
     # Getters
     def getFirstname(self):
-        return firstname
+        return self.firstname
 
     def getLastname(self):
-        return lastname
+        return self.lastname
 
     def getUsername(self):
-        return username
+        return self.username
 
     def getPassword(self):
-        return password
+        return self.password
 
     
