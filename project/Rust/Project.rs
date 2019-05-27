@@ -52,14 +52,16 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-pub fn processMenu(hashTable : HashMap<&str, User::User>) {
+pub fn processMenu(mut hashTable : HashMap<&str, User::User>) {
     // println!("Made it");
     // let mut ynAnswer = String::new();
     // let mut letterChoice = String::new();
+    // let mut usernm = String::new();
 
     while true {
         let mut ynAnswer = String::new();
         let mut letterChoice = String::new();
+        // let mut usernm = String::new();
 
         println!("What would you like to do with the User database? Select a letter from the list below");
         println!("A. Insert a new User");
@@ -73,10 +75,75 @@ pub fn processMenu(hashTable : HashMap<&str, User::User>) {
         letterChoice = letterChoice.trim().to_string();
 
         match &letterChoice as &str {
-            "a" | "A" =>  addUser(&hashTable),
+            "a" | "A" =>  // addUser(&hashTable), 
+            {
+                // let mut usernm = String::new();
+
+                while true {
+                    let mut ynAnswerAdd = String::new();
+                    let mut firstnm = String::new();
+                    let mut lastnm = String::new();
+                    let mut usernm = "";
+                    let mut usernmDif = String::new();
+                    let mut passwd = String::new();
+
+                    println!("What will the first name be for the User you would like to add: ");
+                    io::stdin().read_line(&mut firstnm).expect("Failed to read line");
+                    // let firstnmLong = firstnm.trim().to_string();
+
+                    println!("What will the last name be for the User you would like to add: ");
+                    io::stdin().read_line(&mut lastnm).expect("Failed to read line");
+                    // let lastnmLong = lastnm.trim().to_string();
+
+                    println!("What will the username be for the User you would like to add: ");
+                    io::stdin().read_line(&mut usernmDif).expect("Failed to read line");
+                    // let usernmLong = usernm.to_string();
+
+                    println!("What will the password be for the User you would like to add: ");
+                    io::stdin().read_line(&mut passwd).expect("Failed to read line");
+                    // let passwdLong = passwd.trim().to_string();
+
+                    let user = User::User {
+                        firstname : firstnm, 
+                        lastname : lastnm,         
+                        username : usernmDif, 
+                        password : passwd
+                    };
+                    // usernm = usernmDif;
+                    let usernmNew : &str = &*usernmDif;
+
+                    hashTable.insert(usernmDif, user);
+
+                    println!("User {} added to the hash table!", usernm.to_string());
+                    println!("Would you like to add another User? Input Yes('Y' or 'y') or No('N' or 'n'): ");
+                    io::stdin().read_line(&mut ynAnswerAdd).expect("Failed to read line");
+                    ynAnswerAdd = ynAnswerAdd.trim().to_string();
+
+                    if ynAnswerAdd == "N" || ynAnswerAdd == "n" {
+                        break;
+                    }  
+                }
+            }
             "b" | "B" =>  {
                 // let user = Some(getUser(&hashTable));
-                let user = getUser(&hashTable);
+
+                // let user = getUser(&hashTable);
+                let mut username = String::new();
+
+                println!("What is the name of the User you would like to retrieve: ");
+                io::stdin().read_line(&mut username).expect("Failed to read line");
+                username = username.trim().to_string();
+                // let user = hashTable.get::<str>(&username);
+
+                match hashTable.get::<str>(&username) {
+                    // Some(i) => i,
+                    Some(i) => {
+                        println!("{}", i.username);
+                        // println!("dicks");
+                    },
+                    _ => println!("User not found."), 
+                };
+
                 // if let Some(ref m) = user {
                 //     println!("First Name: {}",  (*m).getFirstname());
                 //     println!("Last Name: {}",  (*m).getLastname());
@@ -117,47 +184,52 @@ pub fn processMenu(hashTable : HashMap<&str, User::User>) {
     } 
 }
 
-pub fn addUser(hashTable : &HashMap<&str, User::User>) {
-    println!("ADD");
-}
+// pub fn addUser(hashTable : &HashMap<&str, User::User>) {
+//     println!("ADD");
+// }
 
-pub fn getUser(hashTable : &HashMap<&str, User::User>){ // std::option::Option<&'a User::User> OR  User::User
-    // println!("GET");
-    let mut username = String::new();
+// pub fn getUser(hashTable : &HashMap<& str, User::User>) -> std::option::Option<User::User>{ // std::option::Option<&'a User::User> OR  User::User
+//     // println!("GET");
+//     let mut username = String::new();
 
-    println!("What is the name of the User you would like to retrieve: ");
-    io::stdin().read_line(&mut username).expect("Failed to read line");
-    username = username.trim().to_string();
-    let user = hashTable.get::<str>(&username);
+//     println!("What is the name of the User you would like to retrieve: ");
+//     io::stdin().read_line(&mut username).expect("Failed to read line");
+//     username = username.trim().to_string();
+//     let user = hashTable.get::<str>(username);
 
-    // let user = Some(hashTable.get(&username));
+//     // let user = Some(hashTable.get(&username));
     
-    // if user == None {
-    //     println!("Could not find User with username {}.", username);
-    // }
-    // else {
-        // println!("User {} retrieved!", username);
-        // return user;
-    // }
+//     // if user == None {
+//     //     println!("Could not find User with username {}.", username);
+//     // }
+//     // else {
+//         // println!("User {} retrieved!", username);
+//         // return user;
+//     // }
 
-    // match user {
-    //     User => {
-    //         println!("User {} retrieved!", username);
-    //         return user;
-    //     },
-    //     None => println!("Could not find User with username {}.", username),
-    // }
+//     // match user {
+//     //     User => {
+//     //         println!("User {} retrieved!", username);
+//     //         return user;
+//     //     },
+//     //     None => println!("Could not find User with username {}.", username),
+//     // }
 
-    // if let Some(ref m) = user {
-    //     println!("User {} retrieved!", (*m));
-    //     return user;
-    // }
-    // else {
-    //     println!("Could not find User with username {}.", user)
-    // }
+//     // let user = match hashTable.get::<str>(&username) {
+//     //     Some(i) => i,
+//     //     _ => None 
+//     // };
 
-    return user; // may not need
-}
+//     // if let Some(ref m) = user {
+//     //     println!("User {} retrieved!", (*m));
+//     //     return user;
+//     // }
+//     // else {
+//     //     println!("Could not find User with username {}.", user)
+//     // }
+
+//     return user; // may not need
+// }
 
 pub fn removeUser(hashTable : &HashMap<&str, User::User>) {
     println!("REMOVE");
@@ -168,7 +240,9 @@ pub fn printEfficienyData(hashTable : &HashMap<&str, User::User>) {
 }
 
 
-// while {
+// while true {
 
-//     ynAnswer == "F" || ynAnswer == "f"
-// } {}
+//     if ynAnswer == "F" || ynAnswer == "f" {\
+//         break;
+//     }  
+// }
