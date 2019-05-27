@@ -79,50 +79,50 @@ pub fn processMenu(mut hashTable : HashMap<&str, User::User>) {
             {
                 // let mut usernm = String::new();
 
-                while true {
-                    let mut ynAnswerAdd = String::new();
-                    let mut firstnm = String::new();
-                    let mut lastnm = String::new();
-                    let mut usernm = "";
-                    let mut usernmDif = String::new();
-                    let mut passwd = String::new();
+                // while true {
+                //     let mut ynAnswerAdd = String::new();
+                //     let mut firstnm = String::new();
+                //     let mut lastnm = String::new();
+                //     let mut usernm = "";
+                //     let mut usernmDif = String::new();
+                //     let mut passwd = String::new();
 
-                    println!("What will the first name be for the User you would like to add: ");
-                    io::stdin().read_line(&mut firstnm).expect("Failed to read line");
-                    // let firstnmLong = firstnm.trim().to_string();
+                //     println!("What will the first name be for the User you would like to add: ");
+                //     io::stdin().read_line(&mut firstnm).expect("Failed to read line");
+                //     // let firstnmLong = firstnm.trim().to_string();
 
-                    println!("What will the last name be for the User you would like to add: ");
-                    io::stdin().read_line(&mut lastnm).expect("Failed to read line");
-                    // let lastnmLong = lastnm.trim().to_string();
+                //     println!("What will the last name be for the User you would like to add: ");
+                //     io::stdin().read_line(&mut lastnm).expect("Failed to read line");
+                //     // let lastnmLong = lastnm.trim().to_string();
 
-                    println!("What will the username be for the User you would like to add: ");
-                    io::stdin().read_line(&mut usernmDif).expect("Failed to read line");
-                    // let usernmLong = usernm.to_string();
+                //     println!("What will the username be for the User you would like to add: ");
+                //     io::stdin().read_line(&mut usernmDif).expect("Failed to read line");
+                //     // let usernmLong = usernm.to_string();
 
-                    println!("What will the password be for the User you would like to add: ");
-                    io::stdin().read_line(&mut passwd).expect("Failed to read line");
-                    // let passwdLong = passwd.trim().to_string();
+                //     println!("What will the password be for the User you would like to add: ");
+                //     io::stdin().read_line(&mut passwd).expect("Failed to read line");
+                //     // let passwdLong = passwd.trim().to_string();
 
-                    let user = User::User {
-                        firstname : firstnm, 
-                        lastname : lastnm,         
-                        username : usernmDif, 
-                        password : passwd
-                    };
-                    // usernm = usernmDif;
-                    let usernmNew : &str = &*usernmDif;
+                //     let user = User::User {
+                //         firstname : firstnm, 
+                //         lastname : lastnm,         
+                //         username : usernmDif, 
+                //         password : passwd
+                //     };
+                //     // usernm = usernmDif;
+                //     let usernmNew : &str = &*usernmDif;
 
-                    hashTable.insert(usernmDif, user);
+                //     hashTable.insert(usernmDif, user);
 
-                    println!("User {} added to the hash table!", usernm.to_string());
-                    println!("Would you like to add another User? Input Yes('Y' or 'y') or No('N' or 'n'): ");
-                    io::stdin().read_line(&mut ynAnswerAdd).expect("Failed to read line");
-                    ynAnswerAdd = ynAnswerAdd.trim().to_string();
+                //     println!("User {} added to the hash table!", usernm.to_string());
+                //     println!("Would you like to add another User? Input Yes('Y' or 'y') or No('N' or 'n'): ");
+                //     io::stdin().read_line(&mut ynAnswerAdd).expect("Failed to read line");
+                //     ynAnswerAdd = ynAnswerAdd.trim().to_string();
 
-                    if ynAnswerAdd == "N" || ynAnswerAdd == "n" {
-                        break;
-                    }  
-                }
+                //     if ynAnswerAdd == "N" || ynAnswerAdd == "n" {
+                //         break;
+                //     }  
+                // }
             }
             "b" | "B" =>  {
                 // let user = Some(getUser(&hashTable));
@@ -138,10 +138,13 @@ pub fn processMenu(mut hashTable : HashMap<&str, User::User>) {
                 match hashTable.get::<str>(&username) {
                     // Some(i) => i,
                     Some(i) => {
-                        println!("{}", i.username);
+                        println!("First Name: {}", i.username);
+                        println!("Last Name: {}", i.username);
+                        println!("Username: {}", i.username);
+                        println!("Password: {}", i.username);
                         // println!("dicks");
                     },
-                    _ => println!("User not found."), 
+                    _ => println!("User not found! "), 
                 };
 
                 // if let Some(ref m) = user {
@@ -165,7 +168,52 @@ pub fn processMenu(mut hashTable : HashMap<&str, User::User>) {
                 //     println!("Password: {}",  user.getPassword());
                 // }
             },
-            "c" | "C" =>  removeUser(&hashTable),
+            "c" | "C" =>  //removeUser(&hashTable), 
+            {
+                while true {
+                    let mut ynAnswerRemove = String::new();
+                    let mut isthere : bool = false;
+                    let mut username = String::new();
+                    let mut a = 2;
+                    println!("What is the username of the User you would like to remove: ");
+                    io::stdin().read_line(&mut username).expect("Failed to read line");
+                    username = username.trim().to_string();
+
+                    match hashTable.get::<str>(&username) {
+                        Some(i) => {
+                            isthere = true;
+                        },
+                        _ => {
+                            println!("User not found!");
+                        }, 
+                    };
+
+                    if isthere == true {
+                        hashTable.remove::<str>(&username);
+                        match hashTable.get::<str>(&username) {
+                            Some(i) => {
+                                // do nothing
+                            },
+                            _ => {
+                                println!("User {} removed from the hash table!", username)
+                            }, 
+                        };
+                    }
+
+                    println!("Would you like to try removing another User? Input Yes('Y' or 'y') or No('N' or 'n'): ");
+                    io::stdin().read_line(&mut ynAnswerRemove).expect("Failed to read line");
+                    ynAnswerRemove = ynAnswerRemove.trim().to_string();
+
+                    match &ynAnswerRemove as &str {
+                        "n" | "N" => break,
+                        _ => a = 1
+                    };
+
+                    // if ynAnswerRemove == "N" || ynAnswerRemove == "n" {
+                    //     break;
+                    // }  
+                }
+            }
             "d" | "D" =>  println!("hashTable.undoRemove();"),
             "e" | "E" =>  printEfficienyData(&hashTable),
             // "a" | "A" =>  println!("A"),
@@ -231,9 +279,9 @@ pub fn processMenu(mut hashTable : HashMap<&str, User::User>) {
 //     return user; // may not need
 // }
 
-pub fn removeUser(hashTable : &HashMap<&str, User::User>) {
-    println!("REMOVE");
-}
+// pub fn removeUser(hashTable : &HashMap<&str, User::User>) {
+//     println!("REMOVE");
+// }
 
 pub fn printEfficienyData(hashTable : &HashMap<&str, User::User>) {
     println!("PRINT");
