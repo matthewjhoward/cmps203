@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::ptr;
 
 mod User;
+// mod LinkedStacker;
 // use User::User;
 
 fn main() -> io::Result<()> {
@@ -294,3 +295,65 @@ pub fn printEfficienyData(hashTable : &HashMap<&str, User::User>) {
 //         break;
 //     }  
 // }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+pub struct HashEntry<K, V> {
+    pub key: K,
+    pub value: V,
+    pub next: Box<HashEntry<K, V>>, //HashEntry<K,V>?
+}
+
+pub struct Node<V> {
+    pub data: V,
+    pub nextNode: Box<Node<V>>, //Node<V>?
+}
+
+impl<V> Node<V> {
+    pub fn getData(self) -> V {
+        return self.data;
+    }
+}
+
+pub struct LinkedStacker<V> {
+    pub top: Box<Node<V>>, //Node<V>
+}
+
+impl<V> LinkedStacker<V> {
+    pub fn isEmpty(self) -> bool {
+        match self.top {
+            Box::new(Some(i)) => {
+                return false;
+            },
+            _ => return true, 
+        };
+    }
+
+    pub fn push(self, datas : V) -> bool {
+        let mut newNode = Node{
+            data : datas, 
+            nextNode : Box::new(None),
+        };
+        newNode.nextNode = self.top;
+        self.top = newNode;
+        return true;
+    }
+
+    pub fn pop(self) -> bool {
+        if self.isEmpty() == true {
+            return false
+        }
+
+        let mut nodeToDelete = self.top;
+        self.top = self.top.nextNode;
+        match nodeToDelete {
+            _ => None, 
+        };
+        return true;
+    }
+
+    pub fn peek(self) -> V {
+        return self.top.data;
+    }
+}
