@@ -1,3 +1,18 @@
+function hasher(keyVal) 
+    local s = keyVal
+    local a = {}
+    for i = 1, string.len(s) do
+        table.insert(a, string.sub(s, i, i))
+    end
+
+    local sum = 0
+    for i,v in ipairs(a) do
+        sum = sum + string.byte(v)
+    end
+
+    return sum
+end
+
 -- DEFINE USER CLASS
 local User = {}
 User.__index = User
@@ -50,7 +65,8 @@ Node.__index = Node
 function Node.new(dataVal)
     local selfNode = setmetatable({}, Node)
     selfNode.data = dataVal
-    selfNode.nextNode = Node.new(nil)
+    -- selfNode.nextNode = Node.new(nil)
+    selfNode.nextNode = nil
     return selfNode
 end
 
@@ -66,7 +82,8 @@ function HashEntry.new(keyVal, val)
     local selfHashEntry = setmetatable({}, HashEntry)
     selfHashEntry.key = keyVal
     selfHashEntry.value = val
-    selfHashEntry.next = HashEntry.new(nil, nil)
+    -- selfHashEntry.next = HashEntry.new(nil, nil)
+    selfHashEntry.next = nil
     return selfHashEntry
 end
 
@@ -76,13 +93,14 @@ local LinkedStacker = {}
 LinkedStacker.__index = LinkedStacker
 
 function LinkedStacker.new()
-    local selfLinkedStacker = setmetatable({}, LinkedStack)
-    selfLinkedStacker.top = Node.new(nil)
+    local selfLinkedStacker = setmetatable({}, LinkedStacker)
+    -- selfLinkedStacker.top = Node.new(nil)
+    selfLinkedStacker.top = nil
     return selfLinkedStacker
 end
 
 function LinkedStacker.isEmpty(selfLinkedStacker)
-    if selfLinkedStacker.top.data == nil then --may need to change how I am dealing with nulls later on! ALSO could be the I need : instead for accessing local variables
+    if selfLinkedStacker.top == nil then
         return true
     else
         return false
@@ -97,7 +115,7 @@ function LinkedStacker.push(selfLinkedStacker, dataVal)
 end
 
 function LinkedStacker.pop(selfLinkedStacker)
-    if selfLinkedStacker:isEmpty() == true then -- Might need . instead or something different with how I call it (i.e., make an object instance first?)
+    if selfLinkedStacker:isEmpty() == true then 
         return false
     end
     
@@ -121,10 +139,11 @@ function HashMapper.new()
     selfHashMapper.size = 0
     selfHashMapper.nBuckets = 20
     selfHashMapper.buckets = {}
-    selfHashMapper.undoStack = LinkedStacker.new()
+    -- selfHashMapper.undoStack = LinkedStacker.new()
+    selfHashMapper.undoStack = nil
 
-    for i=0,nBuckets do --given range could be wrong?
-        table.insert(buckets, nil)
+    for i=0, selfHashMapper.nBuckets do 
+        table.insert(selfHashMapper.buckets, nil)
     end
 
     return selfHashMapper
@@ -135,8 +154,8 @@ function HashMapper.size(selfHashMapper)
 end
 
 function HashMapper.bucketIndex(selfHashMapper, keyVal)
-    local hash = keyVal.hashCode -- need to get actual call for this
-    local idx = hash % nBuckets
+    local hash = hasher(keyVal)
+    local idx = hash % selfHashMapper.nBuckets
     return idx
 end
 
@@ -158,7 +177,7 @@ function HashMapper.put(selfHashMapper, keyVal, val)
     add.next = head
     selfHashMapper.buckets[idx] = add
 
-    selfHashMapper:resizeTable() -- probably need to reorder this actually
+    selfHashMapper:resizeTable() 
 end
 
 function HashMapper.get(selfHashMapper, keyVal)
@@ -175,7 +194,7 @@ end
 
 function HashMapper.remove(selfHashMapper, keyVal)
     local idx = selfHashMapper:bucketIndex(keyVal)
-    local head = buckets[idx]
+    local head = selfHashMapper.buckets[idx]
     local prev = nil
     while head ~= nil do
         if head.key == keyVal then
@@ -189,6 +208,10 @@ function HashMapper.remove(selfHashMapper, keyVal)
         return nil
     end
     
+    if selfHashMapper.undoStack == nil then             
+        selfHashMapper.undoStack = LinkedStacker.new(nil)
+    end
+
     selfHashMapper.undoStack:push(head.value)
     selfHashMapper.size = selfHashMapper.size - 1
 
@@ -202,11 +225,15 @@ function HashMapper.remove(selfHashMapper, keyVal)
 end
 
 function HashMapper.undoRemove(selfHashMapper)
+    if selfHashMapper.undoStack == nil then             
+        selfHashMapper.undoStack = LinkedStacker.new(nil)
+    end
+
     if selfHashMapper.undoStack:isEmpty() == true then
         print("There are no removals to undo!")
         return false
     else 
-        local user = undoStack.peek()
+        local user = selfHashMapper.undoStack:peek()
         local username = user:getUsername()
         selfHashMapper:put(username, user)
 
@@ -257,10 +284,10 @@ function addUser(hashTable)
         print("What will be the Username of the User you would like to add?")
         usernm = io.read()
 
-        if hashTable[usernm] ~= nil then
-        -- if hashTable.get(usernm) ~= nil then
-            while hashTable[usernm] ~= nil do
-            -- while hashTable:get(usernm) ~= nil do
+        -- if hashTable[usernm] ~= nil then
+        if hashTable:get(usernm) ~= nil then
+            -- while hashTable[usernm] ~= nil do
+            while hashTable:get(usernm) ~= nil do
                 print("There is already a User with that username in the hash table! Please try another username: ")
                 usernm = io.read()
             end
@@ -270,8 +297,8 @@ function addUser(hashTable)
         passwd = io.read()
 
         local user = User.new(firstnm, lastnm, usernm, passwd)
-        hashTable[usernm] = user 
-        -- hashTable:put(usernm, user)
+        -- hashTable[usernm] = user 
+        hashTable:put(usernm, user)
  
         print("User " .. usernm .. " added to the hash table!")
         print("Would you like to add another User? Input Yes('Y' or 'y') or No('N' or 'n'): ")
@@ -292,8 +319,8 @@ function getUser(hashTable)
     print("What is the Username of the User you would like to retrieve?")
     usernm = io.read()
 
-    local user = hashTable[usernm]
-    -- local user = hashTable:get(usernm)
+    -- local user = hashTable[usernm]
+    local user = hashTable:get(usernm)
 
     if user == nil then
         print("Could not find User with username " .. usernm .. ".")
@@ -314,14 +341,14 @@ function removeUser(hashTable)
         print("What is the username of the User you would like to remove: ");
         usernm = io.read()
 
-        if hashTable[usernm] == null then
-        -- if hashTable:get(usernm) == null then
+        -- if hashTable[usernm] == nil then
+        if hashTable:get(usernm) == nil then
             print("User not found! ")
         else 
-            hashTable[usernm] = nil
-            -- hashTable:remove(usernm)
-            if hashTable[usernm] == nil then
-            -- if hashTable:get(usernm) == nil then
+            -- hashTable[usernm] = nil
+            hashTable:remove(usernm)
+            -- if hashTable[usernm] == nil then
+            if hashTable:get(usernm) == nil then
                 print("User " .. usernm  .. " removed from the hash table!");
             end
         end
@@ -369,7 +396,7 @@ function processMenu(hashTable)
         elseif letterChoice == "c" or letterChoice == "C" then
             removeUser(hashTable)
         elseif letterChoice == "d" or letterChoice == "D" then
-            -- hashTable:undoRemove(hashTable)
+            hashTable:undoRemove(hashTable)
         elseif letterChoice == "e" or letterChoice == "E" then
             printEfficiencyData(hashTable)
         elseif letterChoice == "f" or letterChoice == "F" then 
@@ -388,8 +415,8 @@ for line in io.lines("input.txt") do
     table.insert(lines, line)
 end
 
-local hashTable = {}
--- local hashTable = HashMapper.new()
+-- local hashTable = {}
+local hashTable = HashMapper.new()
 
 for i in pairs(lines) do
     local tokens = {}
@@ -398,8 +425,8 @@ for i in pairs(lines) do
     end
 
     local user = User.new(tokens[1], tokens[2], tokens[3], tokens[4])
-    hashTable[tokens[3]] = user 
-    -- hashTable:put(tokens[3], user)
+    -- hashTable[tokens[3]] = user 
+    hashTable:put(tokens[3], user)
 end
 
 processMenu(hashTable)
