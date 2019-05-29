@@ -1,2 +1,0 @@
-Alex,Williamson,alswilli,ucscStudentMS
-Matt,Howard,majohowa,ucscStudentPhD
