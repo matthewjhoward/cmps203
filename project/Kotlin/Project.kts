@@ -44,9 +44,6 @@ class HashEntry(var key: String, var value: User) : Entry() {
   var next: Entry = NullEntry()
 }
 
-
-
-
 class HashMapper(){
   
   val nullEntry = NullEntry()
@@ -62,9 +59,7 @@ class HashMapper(){
 
   fun bucketIndex(key: String) : Int {
     val hash = key.hashCode() and 0x7FFFFFFF
-    // println(hash)
     val idx = hash % nBuckets
-    // println(idx)
     return idx
   }
 
@@ -120,7 +115,6 @@ class HashMapper(){
     if (head is NullEntry){
       return NullUser()
     }
-    //undoStack push
     var temp = head as HashEntry
     undoStack.push(temp.key, temp.value)
     size -=1
@@ -274,20 +268,6 @@ fun processMenu(table: HashMapper){
 
 
 fun main() {
-  // var user = EntryUser("first", "last", "username", "pass")
-  // var user2 = EntryUser("first2", "last2", "username2", "pass2")
-  // // val scope = "World"
-  // var map = HashMapper()
-  // println(map.size)
-  // map.put(user.username, user)
-  // println(map.size)
-  // map.put(user2.username, user2)
-  // println(map.size)
-  // var got = map.get(user2.username) as EntryUser
-  // println(got.password)
-  // // println(map.bucketIndex("fire"))
-  // // println(user.firstname)
-
   var table = HashMapper()
   
   val filename = "input.txt"
