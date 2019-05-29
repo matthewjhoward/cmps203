@@ -145,7 +145,7 @@ public class Project {
     public static User getUser(HashMapper<String, User> hashTable) {
         String username;
 
-        System.out.println("What is the name of the User you would like to retrieve: ");
+        System.out.println("What is the Username of the User you would like to retrieve: ");
         Scanner scan = new Scanner(System.in);
         username = scan.nextLine();
         User user = hashTable.get(username);
