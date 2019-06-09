@@ -4,6 +4,7 @@ import java.util.ArrayList
 import util.control.Breaks._
 import scala.io.Source
 import scala.io.StdIn
+import java.io._
 
 
 
@@ -55,7 +56,7 @@ class HashMapper[K,V]() {
 
 
   def bucketIndex(key: K) : Int = {
-    val hash = key.hashCode()
+    val hash = key.hashCode() & 0x7fffffff
     val idx = hash % nBuckets
     return idx
   }
@@ -127,7 +128,7 @@ class HashMapper[K,V]() {
     }else{
       var user: Node[K,V] = undoStack.peek()
       put(user.key, user.value)
-      println("Removal of user " + user.key + " is undone!")
+      // println("Removal of user " + user.key + " is undone!")
       undoStack.pop()
       return true
     }
@@ -143,7 +144,7 @@ class HashMapper[K,V]() {
       for( i <- 0 to nBuckets){
         buckets.add(null)
       }
-      for( i <- 0 to tempBuckets.length){
+      for( i <- 0 to tempBuckets.length-1){
         while (tempBuckets(i) != null){
           put(tempBuckets(i).key, tempBuckets(i).value)
           tempBuckets(i) = tempBuckets(i).next
@@ -165,24 +166,85 @@ class HashMapper[K,V]() {
 
 object Project {
   def main(args: Array[String]) : Unit = {
+    var doMenu = true
     var table = new HashMapper[String, User]()
-    val filename = "input.txt"
-    var lines = Source.fromFile(filename).getLines
-    for (line <- lines){
-      // println(line)
-      var tokens = line.split(",")
-      var firstname = tokens(0)
-      var lastname = tokens(1)
-      var username = tokens(2)
-      var password = tokens(3)
-      var user:User = new User(firstname, lastname, username, password)
-      table.put(username, user)
+    if (doMenu) {
+      
+      val filename = "input.txt"
+      var lines = Source.fromFile(filename).getLines
+      for (line <- lines){
+        // println(line)
+        var tokens = line.split(",")
+        var firstname = tokens(0)
+        var lastname = tokens(1)
+        var username = tokens(2)
+        var password = tokens(3)
+        var user:User = new User(firstname, lastname, username, password)
+        table.put(username, user)
 
+      }
+      println(table.size)
+      processMenu(table)
+    }else{
+      runTests(table)
     }
-    println(table.size)
-    processMenu(table)
   }
 
+  def runTests(hashTable: HashMapper[String,User]) {
+    
+    val filename = "input.txt"
+    var lines = Source.fromFile(filename).getLines
+    var users = new ArrayList[User]()
+    var add_times = new ArrayList[Double]()
+    var del_times = new ArrayList[Double]()
+    var undo_times = new ArrayList[Double]()
+    for (line <- lines){
+      var tokens = line.split(",")
+      var user:User = new User(tokens(0), tokens(1), tokens(2), tokens(3))
+      users.add(user)
+    }
+    var i = 0
+    var start_time = System.nanoTime()
+    for (user <- users){
+      i = i+1
+      hashTable.put(user.username, user)
+
+      if (i%10 == 0){
+        add_times.add((System.nanoTime()-start_time)/1000000.0)
+      }
+    }
+    i = 0
+    start_time = System.nanoTime()
+    for (user <- users){
+      i = i+1
+      hashTable.remove(user.username)
+
+      if (i%10 == 0){
+        del_times.add((System.nanoTime()-start_time)/1000000.0)
+      }
+    }
+    i = 0
+    start_time = System.nanoTime()
+    for (user <- users){
+      i = i+1
+      hashTable.undoRemove()
+
+      if (i%10 == 0){
+        undo_times.add((System.nanoTime()-start_time)/1000000.0)
+      }
+    }
+    val file = new File("output.txt")
+    val bw = new BufferedWriter(new FileWriter(file))
+    bw.write(add_times.mkString(","))
+    bw.newLine()
+    bw.write(del_times.mkString(","))
+    bw.newLine()
+    bw.write(undo_times.mkString(","))
+    bw.newLine()
+    bw.close()
+    // println(undo_times.mkString(","))
+    // theStrings.mkString(",")
+  }
 
   def processMenu(hashTable: HashMapper[String,User]) {
     var ynAnswer: String = ""

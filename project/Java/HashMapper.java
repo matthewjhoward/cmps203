@@ -22,7 +22,7 @@ class HashMapper<K,V>{
     }
 
     public int bucketIndex(K key){
-        int hash = key.hashCode();
+        int hash = key.hashCode() & 0x7fffffff;
         int idx = hash % nBuckets;
         return idx;
     }
@@ -97,7 +97,7 @@ class HashMapper<K,V>{
             K username = (K) userNormal.getUsername();
             put(username, user);
 
-            System.out.println("Removal of user " + username + " is undone!");
+            // System.out.println("Removal of user " + username + " is undone!");
 
             undoStack.pop();
             return true;

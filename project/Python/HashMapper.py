@@ -89,7 +89,7 @@ class HashMapper:
             username = user.getUsername()
             self.put(username, user)
 
-            print("Removal of user " + username + " is undone!")
+            # print("Removal of user " + username + " is undone!")
 
             self.undoStack.pop()
 
@@ -100,7 +100,7 @@ class HashMapper:
             tempBuckets = HashEntry(None, None)
             tempBuckets = self.buckets
             self.buckets = [] # especially here, might need to refer to self.buckets
-            self.nBuckets = 2*nBuckets
+            self.nBuckets = 2*self.nBuckets
             self.size = 0
             for i in range(0, self.nBuckets):
                 self.buckets.append(None)

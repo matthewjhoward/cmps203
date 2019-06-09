@@ -100,7 +100,7 @@ class HashMapper<K,V>{
             var username = userNormal.getUsername() as K;
             put(username, user);
 
-            print("Removal of user " + (username as String) + " is undone!");
+            // print("Removal of user " + (username as String) + " is undone!");
 
             undoStack.pop();
             return true;

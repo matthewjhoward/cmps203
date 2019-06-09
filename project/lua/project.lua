@@ -1,3 +1,4 @@
+
 function hasher(keyVal) 
     local s = keyVal
     local a = {}
@@ -160,7 +161,9 @@ function HashMapper.bucketIndex(selfHashMapper, keyVal)
 end
 
 function HashMapper.put(selfHashMapper, keyVal, val)
+    -- print("Key:" .. keyVal)
     local idx = selfHashMapper:bucketIndex(keyVal)
+    -- print(idx)
     local head = selfHashMapper.buckets[idx]
 
     while head ~= nil do
@@ -250,11 +253,12 @@ function HashMapper.resizeTable(selfHashMapper)
         selfHashMapper.buckets = {}
         selfHashMapper.nBuckets = 2*selfHashMapper.nBuckets
         selfHashMapper.size = 0
-        for i=0,nBuckets do --given range could be wrong?
-            table.insert(buckets, nil)
+        for i=0,selfHashMapper.nBuckets do --given range could be wrong?
+            table.insert(selfHashMapper.buckets, nil)
         end
-        for entry in pairs(tempBuckets) do
-            while entry ~= null do
+        for i in pairs(tempBuckets) do
+            local entry = tempBuckets[i]
+            while entry ~= nil do
                 selfHashMapper:put(entry.key, entry.value)
                 entry = entry.next
             end
@@ -407,6 +411,82 @@ function processMenu(hashTable)
     end
 end
 
+function runTests(hashTable)
+    local lines = {}
+    for line in io.lines("input.txt") do
+        table.insert(lines, line)
+    end
+    local users = {}
+    local add_times = {}
+    local del_times = {}
+    local undo_times = {}
+
+    for i in pairs(lines) do
+        local tokens = {}
+        for word in string.gmatch(lines[i], '([^,]+)') do
+            table.insert(tokens, word)
+        end
+        local user = User.new(tokens[1], tokens[2], tokens[3], tokens[4])
+        
+        table.insert(users, user)
+    end
+
+    local i = 0
+    local start_time = os.clock()
+    for j in pairs(users) do
+        user = users[j]
+        i = i+1
+        if(type(user)~="table")
+        then
+            hashTable:put(user.username, user)
+            
+        end
+        if (i%10==0) then
+            -- print((os.clock()-start_time)*1000)
+            table.insert(add_times, (os.clock()-start_time)*1000)
+        end
+
+        
+    end
+    i = 0
+    start_times = os.clock()
+    for j in pairs(users) do
+        user = users[j]
+        i = i+1
+        if(type(user)~="table")
+        then
+            hashTable:remove(user.username)
+        end
+        if (i%10==0) then
+            -- print((os.clock()-start_time)*1000)
+            table.insert(del_times, (os.clock()-start_time)*1000)
+        end
+    end
+
+    i = 0
+    start_times = os.clock()
+    for j in pairs(users) do
+        user = users[j]
+        -- print(user.username)
+        i = i+1
+        if(type(user)~="table")
+        then
+            hashTable:undoRemove()
+        end
+        if (i%10==0) then
+            -- print((os.clock()-start_time)*1000)
+            table.insert(undo_times, (os.clock()-start_time)*1000)
+        end
+    end
+    local file = io.open("output.txt", "w")
+    io.output(file)
+    io.write(table.concat(add_times, ",") .. "\n")
+    io.write(table.concat(del_times, ",") .. "\n")
+    io.write(table.concat(undo_times, ",") .. "\n")
+    io.close(file)
+    -- print()
+end
+
 
 -- MAIN CODE
 local lines = {}
@@ -429,7 +509,12 @@ for i in pairs(lines) do
     hashTable:put(tokens[3], user)
 end
 
-processMenu(hashTable)
+local doMenu = false
+if doMenu then
+    processMenu(hashTable)
+else    
+    runTests(hashTable)
+end
 
 
 

@@ -1,4 +1,8 @@
+package kotlin.system
+
 import java.io.File
+import java.io.*
+import kotlin.system.*
 
 open class User()
 class NullUser() : User()
@@ -134,13 +138,14 @@ class HashMapper(){
     }else{
       var user = undoStack.peek() as NodeEntry
       put(user.key, user.value)
-      println("Removal of user " + user.key + " is undone!")
+      // println("Removal of user " + user.key + " is undone!")
       undoStack.pop()
       return true
     }
   }
 
   fun resizeTable() {
+
     if( (size*1.0)/nBuckets >= 0.6){
       var tempBuckets = buckets
       buckets = ArrayList<Entry>()
@@ -150,12 +155,13 @@ class HashMapper(){
         buckets.add(nullEntry)
       }
 
-      for(i in 0..tempBuckets.size){
+      for(i in 0..tempBuckets.size-1){
         var temp = tempBuckets.get(i)
         while(temp !is NullEntry){
           temp = temp as HashEntry
           put(temp.key, temp.value)
           tempBuckets.set(i, temp.next)
+          temp = tempBuckets.get(i)
         }
       }
     }
@@ -266,12 +272,13 @@ fun processMenu(table: HashMapper){
   } while(!(letterChoice == "f"));
 }
 
-
-fun main() {
-  var table = HashMapper()
-  
+fun runTests(table: HashMapper){
   val filename = "input.txt"
   var lines = File(filename).readLines()
+  var users = ArrayList<EntryUser>()
+  var add_times = ArrayList<Double>()
+  var del_times = ArrayList<Double>()
+  var undo_times = ArrayList<Double>()
   for(line in lines){
     var tokens = line.split(",")
     var firstname = tokens.get(0)
@@ -279,9 +286,72 @@ fun main() {
     var username = tokens.get(2)
     var password = tokens.get(3)
     var user: EntryUser = EntryUser(firstname, lastname, username, password)
-    table.put(username, user)
+    users.add(user)
+    // table.put(username, user)
   }
-  println(table.size)
-  processMenu(table)
+
+  var i = 0
+  var start_time = System.nanoTime()
+  for (user in users){
+    i = i+1
+    table.put(user.username, user)
+
+    if (i%10 == 0){
+      add_times.add((System.nanoTime() - start_time)/1000000.0)
+    }
+  }
+  i = 0
+  start_time = System.nanoTime()
+  for (user in users){
+    i = i+1
+    table.remove(user.username)
+
+    if (i%10 == 0){
+      del_times.add((System.nanoTime() - start_time)/1000000.0)
+    }
+  }
+  i = 0
+  start_time = System.nanoTime()
+  for (user in users){
+    i = i+1
+    table.undoRemove()
+
+    if (i%10 == 0){
+      undo_times.add((System.nanoTime() - start_time)/1000000.0)
+    }
+  }
+  try{
+    val fileWriter = FileWriter("output.txt", true)
+    fileWriter.write(add_times.joinToString(prefix="", postfix="", separator=",")+ "\n")
+    fileWriter.write(del_times.joinToString(prefix="", postfix="", separator=",")+ "\n")
+    fileWriter.write(undo_times.joinToString(prefix="", postfix="", separator=",")+ "\n")
+    fileWriter.close()
+  } catch (exception: Exception){
+      println(exception.message)
+  }
+  println(add_times.joinToString(prefix="", postfix="", separator=","))
+}
+
+fun main() {
+  var doMenu = false
+  var table = HashMapper()
+  if (doMenu){
+    val filename = "input.txt"
+    var lines = File(filename).readLines()
+    for(line in lines){
+      var tokens = line.split(",")
+      var firstname = tokens.get(0)
+      var lastname = tokens.get(1)
+      var username = tokens.get(2)
+      var password = tokens.get(3)
+      var user: EntryUser = EntryUser(firstname, lastname, username, password)
+      table.put(username, user)
+    }
+    println(table.size)
+    processMenu(table)
+  }else{
+    runTests(table)
+  }
+
 }
 main()

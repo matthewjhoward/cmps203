@@ -2,28 +2,95 @@ from HashMapper import HashMapper
 from User import User
 
 def main():
-    lines = []
-    f = open("input.txt", "r")
-    
-    for line in f:
-        lines.append(line)
+    doMenu = True
+    hashTable = HashMapper()
+    if doMenu:
+        lines = []
+        f = open("input.txt", "r")
+        
+        for line in f:
+            lines.append(line)
 
-    hashTable = HashMapper()    
+            
 
-    for line in lines:
-        tokens = line.split(",")
+        for line in lines:
+            tokens = line.split(",")
 
-        firstname = tokens[0]
-        lastname = tokens[1]
-        username = tokens[2]
-        password = tokens[3]
+            firstname = tokens[0]
+            lastname = tokens[1]
+            username = tokens[2]
+            password = tokens[3]
 
-        user = User(firstname, lastname, username, password)
-        hashTable.put(username, user)
-    
-    processMenu(hashTable) #need self?
-
+            user = User(firstname, lastname, username, password)
+            hashTable.put(username, user)
+        
+        processMenu(hashTable) #need self?
+        f.close()
+    else:
+        runTests(hashTable)
     return
+
+def runTests(hashTable):
+    from datetime import datetime
+    from datetime import timedelta
+    import csv
+    
+    start_time = datetime.now()
+
+    # returns the elapsed milliseconds since the start of the program
+    def millis():
+        dt = datetime.now() - start_time
+        ms = (dt.days * 24 * 60 * 60 + dt.seconds) * 1000 + dt.microseconds / 1000.0
+        return ms
+    
+    users = []
+    with open('input.txt', 'r') as infile:
+        for line in infile:
+            tokens = line.split(',')
+            users.append(User(tokens[0], tokens[1], tokens[2], tokens[3]))
+    
+    add_times = []
+    del_times = []
+    undo_times = []
+    i = 0
+    start_time = datetime.now()
+    for user in users:
+        i+=1
+        hashTable.put(user.username, user)
+
+        if i%10 == 0:
+            add_times.append(millis())
+        
+    print(add_times)
+    i = 0
+    start_time = datetime.now()
+    for user in users:
+        i+=1
+        hashTable.remove(user.username)
+
+        if i%10 == 0:
+            del_times.append(millis())
+    print(del_times)
+
+    i = 0
+    start_time = datetime.now()
+    for user in users:
+        i+=1
+        hashTable.undoRemove()
+
+        if i%10 == 0:
+            undo_times.append(millis())
+    print(undo_times)
+
+    with open('output.txt', 'w') as fout:
+        writer = csv.writer(fout)
+        writer.writerow(add_times)
+        writer.writerow(del_times)
+        writer.writerow(undo_times)
+
+
+
+
 
 def processMenu(hashTable):
     ynAnswer = None

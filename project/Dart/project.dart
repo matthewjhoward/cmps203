@@ -9,9 +9,70 @@ import 'dart:collection';
 void main() {
   // print("Hello, World");
   File data = new File("input.txt");
-  data.readAsLines().then(processLines);
+  var hashTable = new HashMapper();
+  var doMenu = false;
+  if (doMenu){
+    data.readAsLines().then(processLines);
+  }else{
+    runTests();
+  }
+  
 
   return;
+}
+
+runTests(){
+  File data = new File("input.txt");
+  data.readAsLines().then(processLines2);
+}
+
+processLines2(List<String> fileLines){
+  List<User> users = new List<User>();
+  List<double> add_times = new List<double>();
+  List<double> del_times = new List<double>();
+  List<double> undo_times = new List<double>();
+  for (var line in fileLines){
+      List tokens = line.split(",");
+      User user = new User(tokens[0], tokens[1], tokens[2], tokens[3]);
+      users.add(user);
+  }
+  var hashTable = new HashMapper();
+  var i = 0;
+  var start_time = new DateTime.now().microsecondsSinceEpoch;
+  for(var user in users){
+    i = i+1;
+    hashTable.put(user.username, user);
+
+    if(i%10 == 0){
+      add_times.add((new DateTime.now().microsecondsSinceEpoch - start_time)/1000.0);
+    }
+  }
+  i = 0;
+  start_time = new DateTime.now().microsecondsSinceEpoch;
+  for(var user in users){
+    i = i+1;
+    hashTable.remove(user.username);
+
+    if(i%10 == 0){
+      del_times.add((new DateTime.now().microsecondsSinceEpoch - start_time)/1000.0);
+    }
+  }
+  i = 0;
+  start_time = new DateTime.now().microsecondsSinceEpoch;
+  for(var user in users){
+    i = i+1;
+    hashTable.undoRemove();
+
+    if(i%10 == 0){
+      undo_times.add((new DateTime.now().microsecondsSinceEpoch - start_time)/1000.0);
+    }
+  }
+  var out = new File("output.txt");
+  var sink = out.openWrite();
+  sink.write(add_times.join(",")+"\n");
+  sink.write(del_times.join(",")+"\n");
+  sink.write(undo_times.join(",")+"\n");
+  sink.close();
 }
 
 processLines(List<String> fileLines) {

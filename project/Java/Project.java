@@ -3,44 +3,131 @@ import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.*;
+import java.util.stream.Collectors;
+// import com.opencsv.CSVWriter;
 
 public class Project {
     public static void main(String[] args) {
-        BufferedReader reader;
-        ArrayList<String> lines = new ArrayList<String>();
+        boolean doMenu = false;
+        HashMapper<String, User> hashTable = new HashMapper<>();
+        if(doMenu){
+            BufferedReader reader;
+            ArrayList<String> lines = new ArrayList<String>();
+    
+            // Grab all the lines (comma separated values)
+            try {
+                reader = new BufferedReader(new FileReader("input.txt"));
+                String line = reader.readLine();
+                while (line != null) {
+                    lines.add(line);
+                    line = reader.readLine();
+                }
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    
+            
+    
+            // For each line, store in hash map
+            for (String line : lines) {
+                // Create new user for each line of input and store in hash table
+                String[] tokens = line.split(",");
+    
+                String firstname = tokens[0];
+                String lastname = tokens[1];
+                String username = tokens[2];
+                String password = tokens[3];
+    
+                User user = new User(firstname, lastname, username, password);
+                hashTable.put(username, user);
+            }
+    
+            processMenu(hashTable);
+        }else{
+            runTests(hashTable);
+        }
+        
 
-        // Grab all the lines (comma separated values)
+        return;
+    }
+
+    public static void runTests(HashMapper<String, User> hashTable){
+        ArrayList<User> users = new ArrayList<User>();
+        ArrayList<Double> add_times = new ArrayList<Double>();
+        ArrayList<Double> del_times = new ArrayList<Double>();
+        ArrayList<Double> undo_times = new ArrayList<Double>();
+        BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader("input.txt"));
             String line = reader.readLine();
             while (line != null) {
-                lines.add(line);
+                // System.out.println(line);
+                String[] tokens = line.split(",");
+                User user = new User(tokens[0], tokens[1], tokens[2], tokens[3]);
+                users.add(user);
                 line = reader.readLine();
             }
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        int i = 0;
+        long start_time = System.nanoTime();
+        for (User user : users){
+            i++;
+            hashTable.put(user.username, user);
 
-        HashMapper<String, User> hashTable = new HashMapper<>();
-
-        // For each line, store in hash map
-        for (String line : lines) {
-            // Create new user for each line of input and store in hash table
-            String[] tokens = line.split(",");
-
-            String firstname = tokens[0];
-            String lastname = tokens[1];
-            String username = tokens[2];
-            String password = tokens[3];
-
-            User user = new User(firstname, lastname, username, password);
-            hashTable.put(username, user);
+            if( i%10 == 0){
+                add_times.add((double)(System.nanoTime()-start_time)/1000000.0);
+            }
         }
+        i = 0;
+        start_time = System.nanoTime();
+        for (User user : users){
+            i++;
+            hashTable.remove(user.username);
 
-        processMenu(hashTable);
+            if( i%10 == 0){
+                del_times.add((double)(System.nanoTime()-start_time)/1000000.0);
+            }
+        }
+        i = 0;
+        start_time = System.nanoTime();
+        start_time = System.nanoTime();
+        for (User user : users){
+            i++;
+            hashTable.undoRemove();
 
-        return;
+            if( i%10 == 0){
+                undo_times.add((double)(System.nanoTime()-start_time)/1000000.0);
+            }
+        }
+        
+        try{
+            FileWriter fstream = new FileWriter("output.txt",false);
+            BufferedWriter writer = new BufferedWriter(fstream);
+
+            // CSVWriter writer = new CSVWriter(new FileWriter("output.txt"), ',');
+            String adds = add_times.stream().map(Object::toString).collect(Collectors.joining(","));
+            String dels = del_times.stream().map(Object::toString).collect(Collectors.joining(","));
+            String undos = undo_times.stream().map(Object::toString).collect(Collectors.joining(","));
+            System.out.println(undos);
+            writer.write(adds);
+            writer.newLine();
+            writer.write(dels);
+            writer.newLine();
+            writer.write(undos);
+            writer.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        
+        // System.out.println(Arrays.toString(add_times.toArray()));
+
+        
     }
 
     public static void processMenu(HashMapper<String, User> hashTable) {
