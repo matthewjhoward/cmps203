@@ -101,18 +101,25 @@ type HashMapper() =
         let sizeCheck = (float this.size)/(float this.nBuckets)
         if sizeCheck >= 0.6
         then
-            let mutable tempBuckets = this.buckets
+            printfn "Resizing"
+            let mutable tempBuckets = Array.copy this.buckets
             let mutable keepGoing = true
-            this.buckets = Array.zeroCreate 20
+            
             this.nBuckets <- (this.nBuckets + this.nBuckets)
+            this.buckets <- Array.zeroCreate this.nBuckets
             this.size <- 0
-            for i in 0 .. (Array.length tempBuckets) do
+
+            for i in 0 .. ((Array.length tempBuckets)-1) do
+                let mutable entry = tempBuckets.[i]
                 while keepGoing do
-                    match tempBuckets.[i] with
+                    entry <- tempBuckets.[i]
+                    match entry with
                     | Some(x) ->
                         this.put x.key x.value
-                        Array.set tempBuckets i x.next
-                    | None -> keepGoing <- false
+                        tempBuckets.[i] <- x.next
+                    | None -> 
+                        keepGoing <- false
+
 
     member this.put key value =
         let idx = this.bucketIndex(key)
@@ -127,21 +134,22 @@ type HashMapper() =
                 then 
                     i.value <- value 
                     setValue <- true
+                    keepGoing <- false
                 else
                     head <- i.next
+                    
             | None -> keepGoing <- false
         
         if not setValue
         then
             this.size <- this.size + 1
-            let newBuckets = Array.copy this.buckets
-            head <- Array.get newBuckets idx
+            // let newBuckets = Array.copy this.buckets
+            head <- this.buckets.[idx]
             let add = new HashEntry(key, value)
             add.next <- head
-            Array.set newBuckets idx (Some(add))
-            this.buckets <- newBuckets
-            // printfn "%A" this.buckets
-            this.resizeTable
+            this.buckets.[idx] <- (Some(add))
+            // this.buckets <- newBuckets
+            // this.resizeTable
 
     member this.get (key:string) =
         let idx = this.bucketIndex(key)
@@ -161,6 +169,7 @@ type HashMapper() =
             | None -> keepGoing <- false
 
         returnVal
+    
     member this.remove key =
         let idx = this.bucketIndex(key)
         let mutable head = this.buckets.[idx]
@@ -202,10 +211,10 @@ type HashMapper() =
             match user with
             | Some(i) -> 
                 this.put i.key i.value
-                printfn "Removal of user %s is undone!" i.key
+                // printfn "Removal of user %s is undone!" i.key
                 this.undoStack.pop
             | None -> 
-                printfn "Shouldn't happen"
+                // printfn "Shouldn't happen"
                 true
             
            
@@ -313,20 +322,91 @@ let processMenu table =
       | "e" -> printfn "Nothing here..."
       | "f" -> printfn "Quitting..."
       | _ -> printfn "Input not valid!"
+
+let runTests (table:HashMapper) =
+    let lines = System.IO.File.ReadLines("input.txt")
+    let mutable users = List.empty<User>
+    let mutable add_times = List.empty<float>
+    let mutable del_times = List.empty<float>
+    let mutable undo_times = List.empty<float>
+
+    for line in lines do
+        let tokens = line.Split [|','|]
+        let user = User(tokens.[0], tokens.[1], tokens.[2], tokens.[3])
+        users <- users @ [user]
+
+    printfn "Adds"
+    let mutable i = 0
+    let mutable start_time = DateTime.Now.Ticks
+    for user in users do
+        i <- i+1
+        
+        // printfn "%s" user.username
+        table.put user.username user
+        if i%10 = 0
+        then
+            add_times <- add_times @ [(float (DateTime.Now.Ticks - start_time))/(100000.0)]
+    printfn "%i" table.size
+    printfn "Dels"
+    i <- 0
+    start_time <- DateTime.Now.Ticks
+    for user in users do
+        i <- i+1
+        let bool = 
+            match (table.remove user.username) with
+            | Some(i) -> true
+            | None -> false
+        if (not bool)
+        then printfn "%s" user.username
+        if i%10 = 0
+        then
+            del_times <- del_times @ [(float (DateTime.Now.Ticks - start_time))/(100000.0)]
+
+    printfn "Undos"
+    i <- 0
+    let mutable count = 0
+    start_time <- DateTime.Now.Ticks
+    for user in users do
+        i <- i+1
+        let bool = table.undoRemove
+        if (not bool)
+        then
+            // printfn "%s" user.username
+            count <- count + 1
+        if i%10 = 0
+        then
+            undo_times <- undo_times @ [(float (DateTime.Now.Ticks - start_time))/(100000.0)]
+    let convertToString l = l |> List.map (sprintf "%A") |> String.concat ","
+    let delString = convertToString del_times
+    let undoString = convertToString undo_times
+    let addString = convertToString add_times
+    let sw = System.IO.StreamWriter("output.txt")
+    sw.WriteLine(addString)
+    sw.WriteLine(delString)
+    sw.WriteLine(undoString)
+    // printfn "%s" addString
+    // printfn "%s" delString
+    // printfn "%s" undoString
+    sw.Close()
  
 [<EntryPoint>]
 let main args =
+    let doMenu = true
     let map = HashMapper()
-    let filename = "input.txt"
-    let lines = System.IO.File.ReadLines(filename)
-    for line in lines do
-        let tokens = line.Split [|','|]
-        let firstname = tokens.[0]
-        let lastname = tokens.[1]
-        let username = tokens.[2]
-        let password = tokens.[3]
-        let user = User(firstname, lastname, username, password)
-        map.put username user
+    if doMenu
+    then
+        let filename = "input.txt"
+        let lines = System.IO.File.ReadLines(filename)
+        for line in lines do
+            let tokens = line.Split [|','|]
+            let firstname = tokens.[0]
+            let lastname = tokens.[1]
+            let username = tokens.[2]
+            let password = tokens.[3]
+            let user = User(firstname, lastname, username, password)
+            map.put username user
 
-    processMenu map
+        processMenu map
+    else
+        runTests map
     0
